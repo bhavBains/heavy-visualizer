@@ -33,12 +33,30 @@ function loadFirstBeat () {
   loudness = audio_analysis.segments[0].loudness_start;
 }
 
-function playBeat() {
+// Below function is for the amplitude based on the time at the start of the segment
+
+// function playBeatStart() {
+//   if (position_in_segments >= audio_analysis.segments.length - 1) {
+//     return;
+//   }
+//   // x is 0 to 1 for loudness
+//   let x = (loudness + 60)/60;
+//   musicImpact(x);
+//   // load next beat
+//   loudness = audio_analysis.segments[position_in_segments].loudness_start;
+//   duration = audio_analysis.segments[position_in_segments].duration;
+//   duration *= 1000;
+//   position_in_segments++;
+//   // console.log(duration);
+//   setTimeout(playBeatStart, duration);
+// }
+
+function playBeatPeak() {
   if (position_in_segments >= audio_analysis.segments.length - 1) {
     return;
   }
-  // change value
-  let x = loudness/(-60);
+  // x is 0 to 1 for loudness
+  let x = (loudness + 60)/60;
   musicImpact(x);
   // load next beat
   loudness = audio_analysis.segments[position_in_segments].loudness_start;
@@ -46,7 +64,7 @@ function playBeat() {
   duration *= 1000;
   position_in_segments++;
   // console.log(duration);
-  setTimeout(playBeat, duration);
+  setTimeout(playBeatPeak, duration);
 }
 
 function init(properties) {
@@ -111,7 +129,7 @@ function init(properties) {
 
     // universe begins, loads loudness for first instance.
     loadFirstBeat();
-    playBeat();
+    playBeatPeak();
     // music started
 }
 
@@ -153,3 +171,17 @@ function musicImpact(x) {
     // mesh.rotation.y += 0.02;
     // animate(properties);
 }
+
+var lowest = 0;
+var highest = 0;
+audio_analysis.segments.forEach(function(segment) {
+  segment.timbre.forEach(function(value) {
+    if (value < lowest) {
+      lowest = value;
+    } else if (value > highest) {
+      highest = value;
+    }
+  });
+});
+console.log("lowest:" + lowest);
+console.log("highest:" + highest);
